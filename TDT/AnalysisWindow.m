@@ -953,7 +953,7 @@ for j=1:trials.gr.num
 end
 
 set(gca, 'box', 'off','tickdir','out','color',[240 240 240]/255)
-set(gca, 'xlim', [-100 600])
+set(gca, 'xlim', [-100 500], 'ylim', [-0.05 1.0])
 
 
 function plotGroupSpd(handles)
@@ -968,7 +968,7 @@ for j=1:trials.gr.num
     hold on
 end
 set(gca, 'box', 'off','tickdir','out','color',[240 240 240]/255)
-set(gca, 'xlim', [-100 600])
+set(gca, 'xlim', [-100 500])
 
 
 

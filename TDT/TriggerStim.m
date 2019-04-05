@@ -58,11 +58,11 @@ else
 end
 
 flushdata(vidobj); % Remove any data from buffer before triggering
-% if isprop(src,'FrameStartTriggerSource')
-%     src.FrameStartTriggerSource = 'Line1';  % Switch from free run to TTL mode
-% else
-%     src.TriggerSource = 'Line1';
-% end
+if isprop(src,'FrameStartTriggerSource')
+    src.FrameStartTriggerSource = 'FixedRate';  % Switch from free run to TTL mode
+else
+    src.TriggerSource = 'FixedRate';
+end
 start(vidobj)
 
 metadata.ts(2)=etime(clock,datevec(metadata.ts(1)));
@@ -185,7 +185,7 @@ if strcmpi(metadata.stim.type,'conditioning')
         set(handles.text4,'BackgroundColor',bckgrd_color2); % light blue
     end
     
-    str1=sprintf('Next:  No %d,  CS ch %d%s,  ISI %d,  US %d',metadata.eye.trialnum1+1, csnum, str2, isi, usdur);
+    str1=sprintf('Next:  [No %d] ID %d, ISI %d, US %d', metadata.eye.trialnum1+1, metadata.stim.t.tr_ID, isi, usdur);
     set(handles.text_disp_cond,'String',str1)
 end
 

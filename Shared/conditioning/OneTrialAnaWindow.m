@@ -243,12 +243,12 @@ function pushbutton_LFP_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 ghandles=getappdata(0,'ghandles');
-ghandles.onetrialanagui=LFPWindow;
+ghandles.onetrialLFPgui=LFPWindow;
 setappdata(0,'ghandles',ghandles);
 
 % movegui(ghandles.onetrialanagui,ghandles.pos_lfpwin)
-set(ghandles.onetrialanagui,'units','pixels')
-set(ghandles.onetrialanagui,'position',[ghandles.pos_lfpwin ghandles.size_lfpwin])
+set(ghandles.onetrialLFPgui,'units','pixels')
+set(ghandles.onetrialLFPgui,'position',[ghandles.pos_lfpwin ghandles.size_lfpwin])
 
 
 % --- Executes on selection change in listbox_snip.
@@ -301,7 +301,7 @@ subplot('position',[0.06 0.19 0.90 0.46], 'Parent', handles.uipanel_behavior)
 cla
 plot([-1 1]*1000, [0 0],'k:'),  hold on,   plot([-1 1]*1000, [1 1],'k:'), 
 
-set(gca,'ylim',[-0.15 1.20], 'ytick',[0:0.5:1], 'box', 'off','tickdir','out')
+set(gca,'ylim',[-0.25 1.20], 'ytick',[0:0.5:1], 'box', 'off','tickdir','out')
 
 if isempty(trials.eye(t_num).time), return, end
 xlim1=[trials.eye(t_num).time(1) trials.eye(t_num).time(end)];

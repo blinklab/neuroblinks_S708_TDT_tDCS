@@ -31,6 +31,18 @@ TDT.SetTargetVal('ustim.LStimDelay',metadata.stim.l.delay);
 TDT.SetTargetVal('ustim.LStimDepth',metadata.stim.l.depth);
 TDT.SetTargetVal('ustim.RampTime',metadata.stim.l.ramptm);
 
+% ---- for tDCS stimulation ----
+TDT.SetTargetVal('ustim.tDCS_rise_T',metadata.stim.t.rise_time); %tDCS on=1/off=0
+TDT.SetTargetVal('ustim.tDCS_fall_T',metadata.stim.t.fall_time); %tDCS on=1/off=0
+TDT.SetTargetVal('ustim.TDCSStimAmp',metadata.stim.t.amp); %tDCS on=1/off=0
+% metadata.stim.t.tr_ID
+% TDT.SetTargetVal('ustim.TDCSPulseDur',metadata.stim.t.pulsewidth);
+% TDT.SetTargetVal('ustim.Polarity',metadata.stim.t.traindur); %anodal=0/catodal=1
+% TDT.SetTargetVal('ustim.TDCSStimAmp',metadata.stim.t.amp);
+% TDT.SetTargetVal('ustim.TDCSPauseDur',metadata.stim.t.delay); %Tiempo desde que empieza el tDCS hasta que estimulamos
+% TDT.SetTargetVal('ustim.LStimDepth',metadata.stim.t.depth);
+% TDT.SetTargetVal('ustim.TDCSRampTime',metadata.stim.t.ramptm);
+
 if metadata.stim.l.ramptm > 0
     TDT.SetTargetVal('ustim.PulseShape',1);
 else
@@ -51,7 +63,7 @@ end
         cstonefreq=min(metadata.stim.c.tonefreq(csnum-4), 40000);  
         cstoneamp=metadata.stim.c.toneamp(csnum-4);
         csnum=0; csnum1=0; csnum2=3; 
-    elseif ismember(csnum,[1 2 3]),  % for DIO CS (LED/Wisker)
+    elseif ismember(csnum,[1 2 3 4]),  % for DIO CS (LED/Wisker)
         csnum1=1; csnum2=csnum-1;
     end
     if strcmpi(metadata.stim.type,'conditioning') & ismember(csnum,[7 9]),  % for electrical CS
@@ -61,6 +73,9 @@ end
     end
     if strcmpi(metadata.stim.type,'conditioning') & ismember(csnum,[8 9]),  % for Laser CS
         TDT.SetTargetVal('ustim.LTrainDur',metadata.stim.c.csdur);
+        if metadata.stim.l.freq<=2,
+            TDT.SetTargetVal('ustim.LPulseWidth',metadata.stim.c.csdur*1000);
+        end
         TDT.SetTargetVal('ustim.LStimDelay',0);
         csnum1=3; csnum2=3;
     end
@@ -123,9 +138,10 @@ switch lower(metadata.stim.type) % controling el or opt devices
         end
 end
 
-if get(handles.togglebutton_ampblank,'Value')   % If amplifier blank is set
+% if get(handles.togglebutton_ampblank,'Value')   % If amplifier blank is set
+if 0   % If amplifier blank is set
     TDT.SetTargetVal('ustim.BlankAmp',1);
-    TDT.SetTargetVal('ustim.BlankExtra',str2double(get(handles.edit_blankampextratime,'String')));
+    TDT.SetTargetVal('ustim.BlankExtra',100);
 else
     TDT.SetTargetVal('ustim.BlankAmp',0);
 end

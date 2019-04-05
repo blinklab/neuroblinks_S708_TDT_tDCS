@@ -8,11 +8,20 @@ trials=getappdata(0,'trials');
 
 val=get(handles.popupmenu_stimtype,'Value');
 str=get(handles.popupmenu_stimtype,'String');
+
+%metadata.now=datestr(now); No se si esto estaba en mi version??
 metadata.stim.type=str{val};
 
 stimmode=metadata.stim.type;
 
 trials.savematadata=get(handles.checkbox_save_metadata,'Value');
+
+% metadata.stim.t.ONOFF=str2double(get(handles.edit_tDCSon,'String'));
+% metadata.stim.t.pulsewidth=str2double(get(handles.edit_epulsewidth,'String'));
+% metadata.stim.t.traindur=str2double(get(handles.edit_etraindur,'String'));
+% metadata.stim.t.amp=str2double(get(handles.edit_estimamp,'String'));
+% metadata.stim.t.delay=str2double(get(handles.edit_estimdelay,'String'));
+% metadata.stim.t.depth=str2double(get(handles.edit_estimdepth,'String'));
 
 metadata.stim.e.freq=str2double(get(handles.edit_estimfreq,'String'));
 metadata.stim.e.pulsewidth=str2double(get(handles.edit_epulsewidth,'String'));
@@ -35,17 +44,27 @@ metadata.stim.c.puffdur=str2double(get(handles.edit_puffdur,'String'));
 % --- conditioning -----
 % Need conditional statement so we don't get an error if we're not doing conditioning so trial table hasn't been created
 % if strcmpi(stimmode,'conditioning')
-    trialvars=readTrialTable(metadata.eye.trialnum1);
-    metadata.stim.c.csdur=trialvars(1);
-    metadata.stim.c.csnum=trialvars(2);
-    metadata.stim.c.isi=trialvars(3);
-    metadata.stim.c.usdur=trialvars(4);
-    metadata.stim.c.tonefreq=str2num(get(handles.edit_tone,'String'))*1000;
-    if length(metadata.stim.c.tonefreq)<2, metadata.stim.c.tonefreq(2)=0; end
-    metadata.stim.c.toneamp=str2num(get(handles.edit_toneamp,'String'));
-    if length(metadata.stim.c.toneamp)<2, metadata.stim.c.toneamp(2)=0; end
+trialvars=readTrialTable(metadata.eye.trialnum1);
+metadata.stim.c.csdur=trialvars(1);
+metadata.stim.c.csnum=trialvars(2);
+metadata.stim.c.isi=trialvars(3);
+metadata.stim.c.usdur=trialvars(4);
+% --- tDCS -----
+% metadata.stim.t.ONOFF=trialvars(5);
+% metadata.stim.t.polarity=trialvars(6);
+% metadata.stim.t.amp=trialvars(7);
+metadata.stim.t.amp=trialvars(5);
+metadata.stim.t.rise_time=trialvars(6);
+metadata.stim.t.fall_time=trialvars(7);
+metadata.stim.t.tr_ID=trialvars(11);
 
-    metadata.stim.c.ITI=str2double(get(handles.edit_ITI,'String'));
+% metadata.stim.c.ITI=str2double(get(handles.edit_ITI,'String'));
+metadata.stim.c.ITI=trialvars(10);
+
+metadata.stim.c.tonefreq=str2num(get(handles.edit_tone,'String'))*1000;
+if length(metadata.stim.c.tonefreq)<2, metadata.stim.c.tonefreq(2)=0; end
+metadata.stim.c.toneamp=str2num(get(handles.edit_toneamp,'String'));
+if length(metadata.stim.c.toneamp)<2, metadata.stim.c.toneamp(2)=0; end
 
 %=== 'auto off' codes ====%
 % % Turns off the "continuous" button if we've reached the end of the table in case we want to limit the number of trials done
@@ -88,9 +107,10 @@ switch lower(stimmode)
         warning('Unknown stimulation mode set.');
 end
 
-metadata.cam.time(1)=str2double(get(handles.edit_pretime,'String'));
+metadata.cam.time(1)=trialvars(8);
+% metadata.cam.time(1)=str2double(get(handles.edit_pretime,'String'));
 metadata.cam.time(2)=metadata.stim.totaltime;
-metadata.cam.time(3)=str2double(get(handles.edit_posttime,'String'));
+metadata.cam.time(3)=trialvars(9);
 
 % --- saving params to memory for LFP online ana ---
 tnum=metadata.cam.trialnum;

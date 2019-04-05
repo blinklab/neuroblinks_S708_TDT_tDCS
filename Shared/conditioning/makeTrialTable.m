@@ -5,16 +5,16 @@ function trialtable=makeTrialTable(paramtable_data,randomize)
 [m,n]=size(paramtable_data);
 trialtable=[];
 
-blk_set=unique(paramtable_data(:,6)');
+blk_set=unique(paramtable_data(:,end-1)');
 
 for blk=blk_set,
     trialtable2=[];
-    for i=find(paramtable_data(:,6)'==blk);
+    for i=find(paramtable_data(:,end-1)'==blk);
         r=paramtable_data(i,1);
-        trialtable2=[trialtable2; repmat(paramtable_data(i,2:5),r,1)];
+        trialtable2=[trialtable2; repmat(paramtable_data(i,2:end-2),r,1)];
         % if r=0, repmat returns [], so the row will be ignored.
     end
-    rep_blk=max(paramtable_data((paramtable_data(:,6)==blk),7));
+    rep_blk=max(paramtable_data((paramtable_data(:,end-1)==blk),end));
     if rep_blk==0, rep_blk=1; end
     
     if randomize

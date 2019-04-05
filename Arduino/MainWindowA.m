@@ -88,6 +88,8 @@ setappdata(0,'trials',trials);
 % waitfor(h);
 
 pushbutton_StartStopPreview_Callback(handles.pushbutton_StartStopPreview, [], handles)
+pause(0.2)
+pushbutton_StartStopPreview_Callback(handles.pushbutton_StartStopPreview, [], handles)
 
 % --- init table ----
 if isappdata(0,'paramtable')
@@ -337,6 +339,7 @@ metadata.stim.c.usdur=0;
 metadata.stim.c.cstone=[0 0];
 
 metadata.stim.p.puffdur=str2double(get(handles.edit_puffdur,'String'));
+metadata.stim.p.puffdelay=0;
 
 switch lower(metadata.stim.type)
     case 'none'
@@ -449,8 +452,9 @@ ghandles=getappdata(0,'ghandles');
 metadata=getappdata(0,'metadata');
 vidobj=getappdata(0,'vidobj');
 updaterate=0.017;   % ~67 Hz
-t1=clock-10;
+t1=clock; pause(0.1);
 t0=clock;
+etime2=round(1000*etime(clock,t1)/1000);
 
 eyedata=NaN*ones(500,2);  
 plt_range=-2100;
@@ -464,6 +468,7 @@ if get(handles.togglebutton_stream,'Value')
     set(ghandles.maingui,'CurrentAxes',handles.axes_eye)
     cla
     pl1=plot([plt_range 0],[1 1]*0,'k-'); hold on
+    tx1=text(plt_range(1)+100,0.9,'10');
     set(gca,'color',[240 240 240]/255,'YAxisLocation','right');
     set(gca,'xlim',[plt_range 0],'ylim',[-0.1 1.1])
     set(gca,'xtick',[-3000:500:0],'box','off')
@@ -486,15 +491,20 @@ try
         eyedata(end,2)=(eyelidpos-metadata.cam.calib_offset)/metadata.cam.calib_scale; % eyelid pos
         
         set(pl1,'XData',eyedata(:,1)-etime0,'YData',eyedata(:,2))
-%         set(0,'currentfigure',ghandles.maingui)
-%         set(ghandles.maingui,'CurrentAxes',handles.axes_eye)
-%         plot(eyedata(:,1)-etime0,eyedata(:,2),'k')
-%         set(gca,'xlim',[plt_range 0],'ylim',[-0.1 1.1])
+        %         set(0,'currentfigure',ghandles.maingui)
+        %         set(ghandles.maingui,'CurrentAxes',handles.axes_eye)
+        %         plot(eyedata(:,1)-etime0,eyedata(:,2),'k')
+        %         set(gca,'xlim',[plt_range 0],'ylim',[-0.1 1.1])
         
+        etime1=round(1000*etime(clock,t1)/1000);
+        iti1=str2double(get(handles.edit_ITI,'String'));
+        if etime1~=etime2,
+            set(tx1,'String',num2str(iti1-etime1));
+            etime2=etime1;
+        end
         % --- Trigger ----
         if get(handles.toggle_continuous,'Value') == 1
-            etime1=round(1000*etime(clock,t1))/1000;
-            if etime1>str2double(get(handles.edit_ITI,'String')),
+            if etime1>=iti1,
                 eyeok=checkeye(handles,eyedata);
                 if eyeok
                     TriggerArduino(handles)
@@ -515,9 +525,9 @@ try
 catch
     try % If it's a dropped frame, see if we can recover
         handles.pwin=image(zeros(480,640),'Parent',handles.cameraAx);
-        pause(1) 
+        pause(0.5) 
         closepreview(vidobj);
-        pause(1) 
+        pause(0.2) 
         preview(vidobj,handles.pwin);
         stream(handles)
         disp('Caught camera error')

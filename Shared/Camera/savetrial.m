@@ -33,9 +33,9 @@ fprintf('Data from trial %03d successfully written to disk.\n',metadata.cam.tria
 
 % --- trial counter updated and saved in memory ---
 metadata.cam.trialnum=metadata.cam.trialnum+1;
-if strcmpi(metadata.stim.type,'conditioning') | strcmpi(metadata.stim.type,'electrocondition')
-    metadata.eye.trialnum1=metadata.eye.trialnum1+1;
-end
+% if strcmpi(metadata.stim.type,'conditioning') | strcmpi(metadata.stim.type,'electrocondition')
+metadata.eye.trialnum1=metadata.eye.trialnum1+1;
+% end
 metadata.eye.trialnum2=metadata.eye.trialnum2+1;
 setappdata(0,'metadata',metadata);
 

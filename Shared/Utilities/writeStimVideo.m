@@ -33,6 +33,8 @@ box_y1=round(n*460/640)+[1:box_size];
 box_y2=round(n*500/640)+[1:box_size];
 box_y3=round(n*540/640)+[1:box_size];
 
+if ~isfield(metadata.stim.p,'puffdelay'), metadata.stim.p.puffdelay=0; end
+    
 switch lower(metadata.stim.type)
     case 'none'
         % do nothing for now

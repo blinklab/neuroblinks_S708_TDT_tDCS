@@ -1,6 +1,7 @@
 function streamEyelid(hObject, handles)
-updaterate=0.033;   % 30 Hz
-% updaterate=0.1;   % 10 Hz
+% updaterate=0.033;   % 30 Hz
+% updaterate=0.020;   % 50 Hz
+updaterate=0.1;   % 10 Hz
 
 % Load objects from root app data
 TDT=getappdata(0,'tdt');
@@ -37,9 +38,9 @@ try
 catch
     try % If it's a dropped frame, see if we can recover
         handles.pwin=image(zeros(480,640),'Parent',handles.cameraAx);
-        pause(1) 
+        pause(0.5) 
         closepreview(vidobj);
-        pause(1) 
+        pause(0.2) 
         preview(vidobj,handles.pwin);
         guidata(hObject,handles)
         streamEyelid(hObject, handles)

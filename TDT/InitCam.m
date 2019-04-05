@@ -32,6 +32,7 @@ src.PacketSize = 8228;
 
 src.PacketDelay = 2000;		% Calculated based on frame rate and image size using Mathworks helper function
 vidobj.LoggingMode = 'memory'; 
+% src.AcquisitionFrameRateAbs=50;
 src.AcquisitionFrameRateAbs=200;
 vidobj.FramesPerTrigger=1;
 

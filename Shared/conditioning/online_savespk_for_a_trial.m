@@ -6,7 +6,7 @@ handles = guidata(ghandles.onetrialanagui);
 % -- getting the data name for spike ---
 codes1=get(handles.listbox_snip,'String');
 codevalues=get(handles.listbox_snip,'Value');
-Event=codes1{codevalues}; % 'None', 'Spks', or 'Spk2'
+Event=codes1{codevalues}; % 'None', 'Spks', 'Spk2', or 'LFPs'
 
 metadata=getappdata(0,'metadata');
 trials=getappdata(0,'trials');

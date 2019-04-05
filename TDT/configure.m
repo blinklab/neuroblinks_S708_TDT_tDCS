@@ -15,7 +15,7 @@ metadata.mouse=path1(ind1(end-1)+1:ind1(end)-1);
 % --- camera settings ----
 % Value is in microseconds and should be slightly less than interframe interval, e.g. 1/200*1e6-100 for 200 FPS
 metadata.cam.init_ExposureTime = 1900;
-metadata.cam.init_GainRaw = 6; % 12
+metadata.cam.init_GainRaw = 12; % 12
 % NOTE: In the future this should be dynamically set based on pre and post time
 % For now this variable isn't actually used by TDT version. 
 metadata.cam.recdurA=1000;
@@ -31,9 +31,9 @@ if exist(condfile)
 	paramtable.data=csvread(condfile);
 else
 	paramtable.data=...
-    [9,  220,1,200, 20,1,1;...
-     1,  220,1,200, 0, 1,0;...
-     zeros(2,7)];
+    [9,  220,1,200, 20,0,0,0,1,1;...
+     1,  220,1,200, 0,0,0,0, 1,0;...
+     zeros(2,10)];
 end
 
 
@@ -42,3 +42,5 @@ setappdata(0,'metadata',metadata);
 pause(0.3); 
 
 
+metadata.stim.t.ONOFF=0;
+metadata.stim.t.polarity=1;

@@ -45,7 +45,7 @@ ARDUINO_IDS = {'753303030353514071B0','753303030353514071B0'};
 
 % TDT tank -- not necessary for Arduino version
 % The tank should be registered using TankMon (really only matters for TDT version)
-tank='conditioning1'; 
+tank='conditioning2'; 
 
 % GUI
 % -- specify the location of bottomleft corner of MainWindow & AnalysisWindow  --
