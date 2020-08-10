@@ -12,5 +12,5 @@ current_tr=mod(current_tr-1,m)+1;	% Cycle through the table again if we've reach
 % 	current_tr=m;	% Need this additional step b/c mod(x,{x,2x,3x,..})==0, which happens when we reach the last item in the table
 % end
 
-
+current_tr
 trialvars=trialtable(current_tr,:);

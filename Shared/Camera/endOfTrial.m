@@ -9,17 +9,22 @@ src = getappdata(0,'src');
 handles = guidata(ghandles.maingui);
 
 % Set camera to freerun mode so we can preview
+% Moved to end of function, see below JJS
+
+if get(handles.checkbox_record,'Value') == 1  
+    incrementStimTrial();
+    savetrial();
+else
+    nosavetrial();  
+end
+
+% Set camera to freerun mode after saving data so we can preview without
+% dropped frames
+pause(1)
 if isprop(src,'FrameStartTriggerSource')
     src.FrameStartTriggerSource = 'Freerun';
 else
     src.TriggerSource = 'Freerun';
-end
-
-if get(handles.checkbox_record,'Value') == 1  
-    incrementStimTrial()
-    savetrial();
-else
-    nosavetrial();  
 end
 
 

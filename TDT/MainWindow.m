@@ -22,7 +22,7 @@ function varargout = MainWindow(varargin)
 
 % Edit the above text to modify the response to help MainWindow
 
-% Last Modified by GUIDE v2.5 19-Sep-2017 10:54:40
+% Last Modified by GUIDE v2.5 25-Apr-2019 13:42:00
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -104,9 +104,9 @@ guidata(hObject, handles);
 % h=ParamsWindow;
 % waitfor(h);
 
-pushbutton_StartStopPreview_Callback(handles.pushbutton_StartStopPreview, [], handles)
-pause(0.2) 
-pushbutton_StartStopPreview_Callback(handles.pushbutton_StartStopPreview, [], handles)
+% pushbutton_StartStopPreview_Callback(handles.pushbutton_StartStopPreview, [], handles)
+% pause(0.2) 
+% pushbutton_StartStopPreview_Callback(handles.pushbutton_StartStopPreview, [], handles)
 
 % Create timer to check if we are recording every 3 seconds
 % First delete old instances
@@ -1116,6 +1116,15 @@ function pushbutton_CalbEye_Callback(hObject, eventdata, handles)
 
 % Get stim params and pass to TDT
 % refreshParams(hObject);
+
+% --- fixed pretime and posttime ----
+metadata=getappdata(0,'metadata');
+metadata.cam.time(1)=200;
+% metadata.cam.time(1)=str2double(get(handles.edit_pretime,'String'));
+metadata.cam.time(2)=20;
+metadata.cam.time(3)=500;
+setappdata(0,'metadata',metadata);
+
 sendParamsToTDT(hObject)
 
 TDT=getappdata(0,'tdt');
@@ -1141,8 +1150,10 @@ flushdata(vidobj); % Remove any data from buffer before triggering
 
 if isprop(src,'FrameStartTriggerSource')
     src.FrameStartTriggerSource = 'FixedRate';  % Switch from free run to TTL mode
+    src.FrameStartTriggerActivation = 'RisingEdge';
 else
     src.TriggerSource = 'FixedRate';
+    src.TriggerActivation = 'RisingEdge';
 end
 
 start(vidobj)
@@ -1552,11 +1563,19 @@ function togglebutton_recordContinuous_Callback(hObject, eventdata, handles)
 % Hint: get(hObject,'Value') returns toggle state of togglebutton_recordContinuous
 
 if get(hObject,'value') == 1
-    src.TriggerSelector='AcquisitionStart'; % Not sure if this is correct; may need to be 'FrameStart' as well
-    src.TriggerSource='FixedRate';
+    if isprop(src,'FrameStartTriggerMode')
+        src.FrameStartTriggerSource = 'FixedRate';
+    else
+        src.TriggerSelector='AcquisitionStart'; % Not sure if this is correct; may need to be 'FrameStart' as well
+        src.TriggerSource='FixedRate';
+    end
 else
+    if isprop(src,'FrameStartTriggerMode')
+        src.FrameStartTriggerSource = 'Freerun';
+    else
     src.TriggerSelector='FrameStart';
     src.TriggerSource='Freerun';
+    end
 end
 
 
@@ -1721,3 +1740,26 @@ function popupmenu_stimtype_ButtonDownFcn(hObject, eventdata, handles)
 % hObject    handle to popupmenu_stimtype (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+
+
+function edit_tDCS_gain_Callback(hObject, eventdata, handles)
+% hObject    handle to edit_tDCS_gain (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit_tDCS_gain as text
+%        str2double(get(hObject,'String')) returns contents of edit_tDCS_gain as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit_tDCS_gain_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit_tDCS_gain (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end

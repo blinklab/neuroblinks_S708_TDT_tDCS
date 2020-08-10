@@ -10,9 +10,68 @@ vidobj=getappdata(0,'vidobj');
 metadata=getappdata(0,'metadata');
 src=getappdata(0,'src');
 
+src.AcquisitionFrameRateAbs = metadata.cam.fps;
+
 metadata.TDTtankname=TDT.GetTankName();
 stimmode=metadata.stim.type;
 pre=metadata.cam.time(1);
+
+% --- check tDCS sig ----
+tDCS_sig=TDT.GetTargetVal('ustim.tDCS_matlab');
+tDCS_onoff=round(1000*tDCS_sig/metadata.stim.t.amp); % -1, 0, 1
+id0 = metadata.stim.t.tr_ID;
+
+if id0==1 || id0==2 || id0==5 || id0==6,
+    TDT.SetTargetVal('ustim.tDCS_Reset',1);
+    pause(pre./1e3);
+    TDT.SetTargetVal('ustim.tDCS_Reset',0);
+    % --- gain update ----
+    TDT.SetTargetVal('ustim.tDCS_gain', metadata.stim.t.gain);
+end
+% --- abort a trial if tDCS (pre) is wrong ---
+if id0==3 || id0==4,
+    if tDCS_onoff < 1,
+        incrementTrial();     return,
+    end
+elseif id0==7 || id0==8,
+    if tDCS_onoff > -1,
+        incrementTrial();     return,
+    end
+end
+
+% -- tDCS ON and  OFF --
+if metadata.stim.t.rise_time>1,
+    TDT.SetTargetVal('ustim.Trg_Rise_On',1);
+else
+    TDT.SetTargetVal('ustim.Trg_Rise_On',0);
+end
+if metadata.stim.t.fall_time>1,
+    TDT.SetTargetVal('ustim.Trg_Fall_On',1);
+else
+    TDT.SetTargetVal('ustim.Trg_Fall_On',0);
+end
+if metadata.stim.t.rise_time>1 & metadata.stim.t.fall_time>1,
+    TDT.SetTargetVal('ustim.Trg_Rise_On',0);
+    TDT.SetTargetVal('ustim.Trg_Fall_On',0);
+end
+
+% if id0==2,
+%     TDT.SetTargetVal('ustim.Trg_Rise_On',1);
+%     TDT.SetTargetVal('ustim.Trg_Fall_On',0);
+% elseif id0==4,
+%     TDT.SetTargetVal('ustim.Trg_Rise_On',0);
+%     TDT.SetTargetVal('ustim.Trg_Fall_On',1);
+% elseif id0==6,
+%     TDT.SetTargetVal('ustim.Trg_Rise_On',0);
+%     TDT.SetTargetVal('ustim.Trg_Fall_On',1);
+% elseif id0==8,
+%     TDT.SetTargetVal('ustim.Trg_Rise_On',1);
+%     TDT.SetTargetVal('ustim.Trg_Fall_On',0);
+% else,
+%     TDT.SetTargetVal('ustim.Trg_Rise_On',0);
+%     TDT.SetTargetVal('ustim.Trg_Fall_On',0);
+% end
+% -- end of tDCS --
 
 if TDT.GetSysMode == 0             
     disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%'),
@@ -58,10 +117,14 @@ else
 end
 
 flushdata(vidobj); % Remove any data from buffer before triggering
+
 if isprop(src,'FrameStartTriggerSource')
-    src.FrameStartTriggerSource = 'FixedRate';  % Switch from free run to TTL mode
+    src.FrameStartTriggerSource = 'FixedRate';  % Switch from free run to TTL mode,  Line1, FixedRate
+    src.FrameStartTriggerActivation = 'RisingEdge';
 else
-    src.TriggerSource = 'FixedRate';
+    src.TriggerSource = 'FixedRate'; 
+    src.TriggerActivation = 'RisingEdge';
+    src.TriggerSelector='FrameStart';
 end
 start(vidobj)
 
@@ -167,6 +230,15 @@ if strcmpi(metadata.stim.type,'conditioning')
     e_amp=str2double(get(handles.edit_estimamp,'String'));
     if length(cstone)<2, cstone(2)=0; end
     
+    str1=sprintf('Next:  [No %d] ID %d, ISI %d, US %d', metadata.eye.trialnum1+1, metadata.stim.t.tr_ID, isi, usdur);
+    
+    % --- Current(or Done) Trial info ---
+    trialvars=readTrialTable(metadata.eye.trialnum1);
+    id_1=trialvars(11);
+    isi_1=trialvars(3);
+    usdur_1=trialvars(4);
+    str0=sprintf('Done:  [No %d] ID %d, tDCS (pre) %2.1f ISI %d, US %d    ', metadata.eye.trialnum1, id_1, tDCS_sig, isi_1, usdur_1);
+    
     % --- reset background color ---
     bckgrd_color1=[1 1 1]*240/255;
     set(handles.uipanel_el,'BackgroundColor',bckgrd_color1); % light blue
@@ -185,11 +257,21 @@ if strcmpi(metadata.stim.type,'conditioning')
         set(handles.text4,'BackgroundColor',bckgrd_color2); % light blue
     end
     
-    str1=sprintf('Next:  [No %d] ID %d, ISI %d, US %d', metadata.eye.trialnum1+1, metadata.stim.t.tr_ID, isi, usdur);
-    set(handles.text_disp_cond,'String',str1)
+    
+    
+    set(handles.text_disp_cond,'String',[str0 str1])
 end
 
 
+function incrementTrial()
+trials=getappdata(0,'trials');
+trials.stimnum=trials.stimnum+1;
+setappdata(0,'trials',trials);
 
+metadata=getappdata(0,'metadata');
+metadata.cam.trialnum=metadata.cam.trialnum+1;
+metadata.eye.trialnum1=metadata.eye.trialnum1+1;
+metadata.eye.trialnum2=metadata.eye.trialnum2+1;
+setappdata(0,'metadata',metadata);
 
 

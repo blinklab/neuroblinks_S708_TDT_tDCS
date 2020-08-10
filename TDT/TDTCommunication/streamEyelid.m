@@ -1,7 +1,7 @@
 function streamEyelid(hObject, handles)
-% updaterate=0.033;   % 30 Hz
+updaterate=0.033;   % 30 Hz
 % updaterate=0.020;   % 50 Hz
-updaterate=0.1;   % 10 Hz
+% updaterate=0.1;   % 10 Hz
 
 % Load objects from root app data
 TDT=getappdata(0,'tdt');
@@ -25,6 +25,8 @@ try
                 TriggerStim(hObject, handles)
             end
         end
+%         % --- check tDCS sig ----
+%         tDCS_sig=TDT.GetTargetVal('ustim.tDCS_matlab');
         
         t=toc;
         % -- pause in the left time -----

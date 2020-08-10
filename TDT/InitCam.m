@@ -4,13 +4,15 @@ function InitCam(ch,recdur)
 imaqreset
 
 disp('creating video object ...')
-% vidobj = videoinput('gentl', ch, 'Mono8');
-vidobj = videoinput('gige', ch, 'Mono8');
+vidobj = videoinput('gentl', ch, 'Mono8');
+% vidobj = videoinput('gige', ch, 'Mono8');
 disp('video settings ....')
 
 metadata=getappdata(0,'metadata');
 
 src = getselectedsource(vidobj);
+
+
 src.ExposureTimeAbs = metadata.cam.init_ExposureTime;
 
 % Different version of the camera drivers (and different versions of
@@ -28,18 +30,20 @@ else
 end
 
 % src.NetworkPacketSize = '9014';
-src.PacketSize = 8228;
+% src.PacketSize = 8228;
 
-src.PacketDelay = 2000;		% Calculated based on frame rate and image size using Mathworks helper function
+% src.PacketSize = 1000;
+% src.PacketDelay = 2000;		% Calculated based on frame rate and image size using Mathworks helper function
+
 vidobj.LoggingMode = 'memory'; 
-% src.AcquisitionFrameRateAbs=50;
-src.AcquisitionFrameRateAbs=200;
+
+% src.AcquisitionFrameRateAbs=200;
 vidobj.FramesPerTrigger=1;
 
 % vidobj.LoggingMode = 'memory'; 
 % vidobj.FramesPerTrigger=1;
 % src.AcquisitionFrameRateAbs=200;
-
+src.AcquisitionFrameRateAbs=200;
 %for 2010b
 % triggerconfig(vidobj,'Hardware','RisingEdge','externalTrigger')
 % triggerconfig(vidobj, 'hardware', 'risingEdge', 'externalTrigger');
@@ -60,8 +64,10 @@ else
     src.TriggerActivation = 'LevelHigh';
     src.TriggerSource = 'Freerun';
 end
-    
 
+
+src.SyncOutSource = 'Exposing';
+src.StreamBytesPerSecond = 90000000; % this should be >80000000, otherwise frame rate limit will be too low
 %% Save objects to root app data
 
 setappdata(0,'vidobj',vidobj)

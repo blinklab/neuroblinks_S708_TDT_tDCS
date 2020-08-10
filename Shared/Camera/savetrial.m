@@ -19,6 +19,7 @@ setappdata(0,'lastmetadata',metadata);
 trials=getappdata(0,'trials');
 t0=clock;
 
+
 videoname=sprintf('%s\\%s_%03d',metadata.folder,metadata.TDTblockname,metadata.cam.trialnum);
 if trials.savematadata
     save(videoname,'metadata')
@@ -30,14 +31,22 @@ end
 
 fprintf('Data from trial %03d successfully written to disk.\n',metadata.cam.trialnum)
 
+% --- trial counter updated and saved in memory (in case of frame drop, this should be before data saving) ---
+metadata1=metadata;
+metadata1.cam.trialnum=metadata.cam.trialnum+1;
+if strcmpi(metadata.stim.type,'conditioning'),
+     metadata1.eye.trialnum1=metadata.eye.trialnum1+1;
+end
+metadata1.eye.trialnum2=metadata.eye.trialnum2+1;
+setappdata(0,'metadata',metadata1);
 
-% --- trial counter updated and saved in memory ---
-metadata.cam.trialnum=metadata.cam.trialnum+1;
-% if strcmpi(metadata.stim.type,'conditioning') | strcmpi(metadata.stim.type,'electrocondition')
-metadata.eye.trialnum1=metadata.eye.trialnum1+1;
-% end
-metadata.eye.trialnum2=metadata.eye.trialnum2+1;
-setappdata(0,'metadata',metadata);
+% % --- trial counter updated and saved in memory ---
+% metadata.cam.trialnum=metadata.cam.trialnum+1;
+% % if strcmpi(metadata.stim.type,'conditioning') | strcmpi(metadata.stim.type,'electrocondition')
+% metadata.eye.trialnum1=metadata.eye.trialnum1+1;
+% % end
+% metadata.eye.trialnum2=metadata.eye.trialnum2+1;
+% setappdata(0,'metadata',metadata);
 
 if strcmp(lower(metadata.device),'tdt')
 TDT=getappdata(0,'tdt');

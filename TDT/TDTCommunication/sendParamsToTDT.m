@@ -32,9 +32,14 @@ TDT.SetTargetVal('ustim.LStimDepth',metadata.stim.l.depth);
 TDT.SetTargetVal('ustim.RampTime',metadata.stim.l.ramptm);
 
 % ---- for tDCS stimulation ----
-TDT.SetTargetVal('ustim.tDCS_rise_T',metadata.stim.t.rise_time); %tDCS on=1/off=0
-TDT.SetTargetVal('ustim.tDCS_fall_T',metadata.stim.t.fall_time); %tDCS on=1/off=0
+if metadata.stim.t.rise_time>1, % since 0 was not acceptable in TDT
+    TDT.SetTargetVal('ustim.tDCS_rise_T',metadata.stim.t.rise_time); %tDCS on=1/off=0
+end
+if metadata.stim.t.fall_time>1,
+    TDT.SetTargetVal('ustim.tDCS_fall_T',metadata.stim.t.fall_time); %tDCS on=1/off=0
+end
 TDT.SetTargetVal('ustim.TDCSStimAmp',metadata.stim.t.amp); %tDCS on=1/off=0
+TDT.SetTargetVal('ustim.tDCS_ID',metadata.stim.t.tr_ID); %tDCS on=1/off=0
 % metadata.stim.t.tr_ID
 % TDT.SetTargetVal('ustim.TDCSPulseDur',metadata.stim.t.pulsewidth);
 % TDT.SetTargetVal('ustim.Polarity',metadata.stim.t.traindur); %anodal=0/catodal=1
@@ -59,12 +64,14 @@ end
     TDT.SetTargetVal('ustim.ITI',metadata.stim.c.ITI);
     TDT.SetTargetVal('ustim.CsDur',metadata.stim.c.csdur);
     csnum=metadata.stim.c.csnum;  cstonefreq=0;  cstoneamp=0;  csnum1=3; csnum2=3;
+    if metadata.stim.c.csdur>1
     if ismember(csnum,[5 6]),  % for auditory CS
         cstonefreq=min(metadata.stim.c.tonefreq(csnum-4), 40000);  
         cstoneamp=metadata.stim.c.toneamp(csnum-4);
         csnum=0; csnum1=0; csnum2=3; 
     elseif ismember(csnum,[1 2 3 4]),  % for DIO CS (LED/Wisker)
         csnum1=1; csnum2=csnum-1;
+    end
     end
     if strcmpi(metadata.stim.type,'conditioning') & ismember(csnum,[7 9]),  % for electrical CS
         TDT.SetTargetVal('ustim.ETrainDur',metadata.stim.c.csdur);
@@ -138,8 +145,8 @@ switch lower(metadata.stim.type) % controling el or opt devices
         end
 end
 
-% if get(handles.togglebutton_ampblank,'Value')   % If amplifier blank is set
-if 0   % If amplifier blank is set
+if get(handles.togglebutton_ampblank,'Value')   % If amplifier blank is set
+% if 0   % If amplifier blank is set
     TDT.SetTargetVal('ustim.BlankAmp',1);
     TDT.SetTargetVal('ustim.BlankExtra',100);
 else

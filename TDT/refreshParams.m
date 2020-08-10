@@ -49,17 +49,37 @@ metadata.stim.c.csdur=trialvars(1);
 metadata.stim.c.csnum=trialvars(2);
 metadata.stim.c.isi=trialvars(3);
 metadata.stim.c.usdur=trialvars(4);
-% --- tDCS -----
+% ================== tDCS ================
 % metadata.stim.t.ONOFF=trialvars(5);
 % metadata.stim.t.polarity=trialvars(6);
 % metadata.stim.t.amp=trialvars(7);
 metadata.stim.t.amp=trialvars(5);
-metadata.stim.t.rise_time=trialvars(6);
-metadata.stim.t.fall_time=trialvars(7);
-metadata.stim.t.tr_ID=trialvars(11);
 
-% metadata.stim.c.ITI=str2double(get(handles.edit_ITI,'String'));
-metadata.stim.c.ITI=trialvars(10);
+if strcmpi(stimmode,'conditioning')
+    metadata.stim.t.rise_time=trialvars(6);
+    metadata.stim.t.fall_time=trialvars(7);
+    metadata.stim.t.tr_ID=trialvars(11);
+else
+    metadata.stim.t.rise_time=0;
+    metadata.stim.t.fall_time=0;
+    metadata.stim.t.tr_ID=0;
+end
+metadata.stim.t.gain=str2double(get(handles.edit_tDCS_gain,'String'));
+
+% --- frame rate for the long 6-sec trials ---
+id0 = metadata.stim.t.tr_ID;
+if id0==2 || id0==6,
+    metadata.cam.fps = 40;
+else
+    metadata.cam.fps = 200;
+end
+
+% ================== end of tDCS ================
+if id0==0,
+    metadata.stim.c.ITI=str2double(get(handles.edit_ITI,'String'));
+else
+    metadata.stim.c.ITI=trialvars(10);
+end
 
 metadata.stim.c.tonefreq=str2num(get(handles.edit_tone,'String'))*1000;
 if length(metadata.stim.c.tonefreq)<2, metadata.stim.c.tonefreq(2)=0; end
@@ -107,10 +127,15 @@ switch lower(stimmode)
         warning('Unknown stimulation mode set.');
 end
 
-metadata.cam.time(1)=trialvars(8);
-% metadata.cam.time(1)=str2double(get(handles.edit_pretime,'String'));
+if id0==0,
+    metadata.cam.time(1)=200;
+    metadata.cam.time(3)=800;
+else
+    metadata.cam.time(1)=trialvars(8);
+    % metadata.cam.time(1)=str2double(get(handles.edit_pretime,'String'));
+    metadata.cam.time(3)=trialvars(9);
+end
 metadata.cam.time(2)=metadata.stim.totaltime;
-metadata.cam.time(3)=trialvars(9);
 
 % --- saving params to memory for LFP online ana ---
 tnum=metadata.cam.trialnum;

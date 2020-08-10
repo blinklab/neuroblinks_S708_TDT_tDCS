@@ -61,8 +61,9 @@ function neuroblinks(varargin)
     % Matlab is inconsistent in how it numbers cameras so we need to explicitely search for the right one
     disp('Finding cameras...')
 
+    CAMADAPTOR = 'gentl';
     % Get list of configured cameras
-    foundcams = imaqhwinfo('gige');
+    foundcams = imaqhwinfo(CAMADAPTOR);
     founddeviceids = cell2mat(foundcams.DeviceIDs); 
 
     if isempty(founddeviceids)
@@ -83,7 +84,7 @@ function neuroblinks(varargin)
         % so it's commented out. If you plan to use
         % more than one camera on the same computer you should uncomment it and find a way to get it working.
         for i=1:length(founddeviceids)
-            vidobj = videoinput('gige', founddeviceids(i), 'Mono8');
+            vidobj = videoinput(CAMADAPTOR, founddeviceids(i), 'Mono8');
             src = getselectedsource(vidobj);
             if strcmp(src.DeviceID,ALLOWEDCAMS_2014a{rig})
                 cam = i;
